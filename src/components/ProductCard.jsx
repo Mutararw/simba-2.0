@@ -54,9 +54,9 @@ const ProductCard = ({ product }) => {
           <button 
             onClick={() => addToCart(product)}
             className="btn-primary" 
-            style={{ padding: '0.6rem', borderRadius: '12px' }}
+            style={{ padding: '0.6rem 0.85rem', borderRadius: '12px' }}
           >
-            <Plus size={20} />
+            <Plus size={18} /> Add
           </button>
         </div>
       </div>

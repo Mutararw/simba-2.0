@@ -3,68 +3,93 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Search, ShoppingCart, Sun, Moon, Languages, Menu, X } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 
-const Navbar = ({ theme, toggleTheme, lang, setLang }) => {
+const Navbar = ({ theme, toggleTheme, lang, setLang, searchQuery, setSearchQuery }) => {
   const { cartCount } = useCart()
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const translations = {
-    en: { search: "Search products...", home: "Home", cart: "Cart", checkout: "Checkout" },
-    fr: { search: "Rechercher...", home: "Accueil", cart: "Panier", checkout: "Paiement" },
-    kn: { search: "Shaka ibicuruzwa...", home: "Ahabanza", cart: "Ikarita", checkout: "Kwishura" }
+    en: { search: 'Search products...', home: 'Home', cart: 'Cart', checkout: 'Checkout' },
+    fr: { search: 'Rechercher...', home: 'Accueil', cart: 'Panier', checkout: 'Paiement' },
+    kn: { search: 'Shaka ibicuruzwa...', home: 'Ahabanza', cart: 'Ikarita', checkout: 'Kwishura' }
   }
 
   const t = translations[lang]
+  const navItems = [
+    { to: '/', label: t.home },
+    { to: '/cart', label: t.cart },
+    { to: '/checkout', label: t.checkout }
+  ]
 
   return (
-    <nav className="glass sticky-top" style={{ position: 'sticky', top: 0, zIndex: 1000 }}>
-      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '80px' }}>
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div style={{ background: 'var(--primary)', color: 'white', padding: '0.5rem', borderRadius: '10px', fontWeight: '800', fontSize: '1.5rem' }}>S</div>
-          <span style={{ fontWeight: '800', fontSize: '1.5rem', letterSpacing: '-1px' }}>SIMBA <span style={{ color: 'var(--primary)' }}>2.0</span></span>
+    <nav className="navbar glass sticky-top">
+      <div className="container navbar-shell">
+        <Link to="/" className="brand-mark" onClick={() => setIsMenuOpen(false)}>
+          <div className="brand-logo">S</div>
+          <span className="brand-text">
+            SIMBA <span>2.0</span>
+          </span>
         </Link>
 
-        <div className="search-bar" style={{ flex: 1, maxWidth: '500px', margin: '0 2rem', position: 'relative' }}>
-          <Search size={20} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-          <input 
-            type="text" 
+        <form
+          className="search-bar"
+          onSubmit={(e) => {
+            e.preventDefault()
+            navigate('/')
+            setIsMenuOpen(false)
+          }}
+        >
+          <Search size={18} />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t.search}
-            style={{ 
-              width: '100%', 
-              padding: '0.75rem 1rem 0.75rem 3rem', 
-              borderRadius: '12px', 
-              border: '1px solid var(--border)',
-              background: 'var(--bg)',
-              color: 'var(--text)',
-              fontSize: '1rem'
-            }}
           />
+        </form>
+
+        <div className="nav-links desktop-only">
+          {navItems.map((item) => (
+            <Link key={item.to} to={item.to}>
+              {item.label}
+            </Link>
+          ))}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+        <div className="nav-actions">
           <button onClick={toggleTheme} className="nav-btn" title="Toggle Theme">
             {theme === 'light' ? <Moon size={22} /> : <Sun size={22} />}
           </button>
 
-          <div style={{ position: 'relative', cursor: 'pointer' }} onClick={() => navigate('/cart')}>
+          <button className="nav-btn nav-cart-btn" onClick={() => navigate('/cart')} title={t.cart}>
             <ShoppingCart size={22} />
             {cartCount > 0 && (
-              <span className="badge" style={{ position: 'absolute', top: '-8px', right: '-12px', fontSize: '0.65rem' }}>
+              <span className="badge cart-count-badge">
                 {cartCount}
               </span>
             )}
-          </div>
+          </button>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }} onClick={() => setLang(lang === 'en' ? 'fr' : lang === 'fr' ? 'kn' : 'en')}>
+          <button className="nav-btn lang-btn" onClick={() => setLang(lang === 'en' ? 'fr' : lang === 'fr' ? 'kn' : 'en')}>
             <Languages size={22} />
-            <span style={{ fontWeight: '600', textTransform: 'uppercase' }}>{lang}</span>
-          </div>
+            <span>{lang}</span>
+          </button>
 
-          <button className="mobile-menu-btn" style={{ display: 'none' }} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <button className="mobile-menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle navigation menu">
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
+
+      {isMenuOpen && (
+        <div className="mobile-panel">
+          {navItems.map((item) => (
+            <Link key={item.to} to={item.to} onClick={() => setIsMenuOpen(false)}>
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      )}
     </nav>
   )
 }

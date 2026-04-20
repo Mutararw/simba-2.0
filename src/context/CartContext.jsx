@@ -6,6 +6,7 @@ export const useCart = () => useContext(CartContext)
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([])
+  const [toast, setToast] = useState(null)
 
   useEffect(() => {
     const savedCart = localStorage.getItem('simba_cart')
@@ -16,6 +17,16 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('simba_cart', JSON.stringify(cart))
   }, [cart])
 
+  useEffect(() => {
+    if (!toast) return
+
+    const timer = setTimeout(() => {
+      setToast(null)
+    }, 2400)
+
+    return () => clearTimeout(timer)
+  }, [toast])
+
   const addToCart = (product) => {
     setCart(prev => {
       const existing = prev.find(item => item.id === product.id)
@@ -23,6 +34,11 @@ export const CartProvider = ({ children }) => {
         return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)
       }
       return [...prev, { ...product, quantity: 1 }]
+    })
+
+    setToast({
+      id: Date.now(),
+      name: product.name
     })
   }
 
@@ -41,7 +57,19 @@ export const CartProvider = ({ children }) => {
   const cartCount = cart.reduce((count, item) => count + item.quantity, 0)
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount }}>
+    <CartContext.Provider
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        cartTotal,
+        cartCount,
+        toast,
+        clearToast: () => setToast(null)
+      }}
+    >
       {children}
     </CartContext.Provider>
   )

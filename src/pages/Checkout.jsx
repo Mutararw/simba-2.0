@@ -1,28 +1,44 @@
 import React, { useState } from 'react'
 import { useCart } from '../context/CartContext'
-import { Phone, CheckCircle2, Loader2, ArrowLeft } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Phone, CheckCircle2, Loader2, ShoppingBag } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
 
 const Checkout = ({ lang }) => {
-  const { cartTotal, clearCart } = useCart()
-  const [step, setStep] = useState(1) // 1: Info, 2: Payment, 3: Success
+  const { cart, cartTotal, clearCart } = useCart()
+  const [step, setStep] = useState(1)
   const [phone, setPhone] = useState('')
   const navigate = useNavigate()
 
   const translations = {
-    en: { title: "Checkout", phone: "Phone Number", pay: "Pay with MoMo", success: "Order Successful!", back: "Back to Home" },
-    fr: { title: "Paiement", phone: "Numéro de Téléphone", pay: "Payer avec MoMo", success: "Commande Réussie!", back: "Retour à l'Accueil" },
-    kn: { title: "Kwishura", phone: "Nimero ya Telefone", pay: "Ishura na MoMo", success: "Byagenze neza!", back: "Subira Ahabanza" }
+    en: { title: 'Checkout', phone: 'Phone Number', pay: 'Pay with MoMo', success: 'Order Successful!', back: 'Back to Home', empty: 'Your cart is empty' },
+    fr: { title: 'Paiement', phone: 'Numero de Telephone', pay: 'Payer avec MoMo', success: 'Commande Reussie!', back: "Retour a l'Accueil", empty: 'Votre panier est vide' },
+    kn: { title: 'Kwishura', phone: 'Nimero ya Telefone', pay: 'Ishura na MoMo', success: 'Byagenze neza!', back: 'Subira Ahabanza', empty: 'Ikarita yawe irimo ubusa' }
   }
 
   const t = translations[lang]
+  const cleanPhone = phone.replace(/\D/g, '')
+  const isPhoneValid = cleanPhone.length >= 9
 
   const handlePayment = () => {
+    if (!isPhoneValid || cartTotal <= 0) return
+
     setStep(2)
     setTimeout(() => {
       setStep(3)
       clearCart()
-    }, 3000)
+    }, 2500)
+  }
+
+  if (cart.length === 0 && step !== 3) {
+    return (
+      <div className="container section-padding fade-in" style={{ textAlign: 'center' }}>
+        <ShoppingBag size={80} style={{ color: 'var(--text-muted)', marginBottom: '2rem' }} />
+        <h2 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '1rem' }}>{t.empty}</h2>
+        <Link to="/" className="btn-primary">
+          Continue Shopping
+        </Link>
+      </div>
+    )
   }
 
   if (step === 3) {
@@ -31,7 +47,9 @@ const Checkout = ({ lang }) => {
         <CheckCircle2 size={80} color="#22c55e" style={{ marginBottom: '2rem' }} />
         <h1 style={{ fontSize: '3rem', fontWeight: '800', marginBottom: '1rem' }}>{t.success}</h1>
         <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Thank you for shopping with Simba 2.0. Your order is being processed.</p>
-        <button onClick={() => navigate('/')} className="btn-primary">{t.back}</button>
+        <button onClick={() => navigate('/')} className="btn-primary">
+          {t.back}
+        </button>
       </div>
     )
   }
@@ -53,15 +71,15 @@ const Checkout = ({ lang }) => {
                 <label style={{ fontWeight: '600', color: 'var(--text-muted)' }}>{t.phone}</label>
                 <div style={{ position: 'relative' }}>
                   <Phone size={20} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                  <input 
-                    type="tel" 
+                  <input
+                    type="tel"
                     placeholder="078X XXX XXX"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    style={{ 
-                      width: '100%', 
-                      padding: '1rem 1rem 1rem 3rem', 
-                      borderRadius: '16px', 
+                    style={{
+                      width: '100%',
+                      padding: '1rem 1rem 1rem 3rem',
+                      borderRadius: '16px',
                       border: '1px solid var(--border)',
                       background: 'var(--bg)',
                       color: 'var(--text)',
@@ -69,15 +87,20 @@ const Checkout = ({ lang }) => {
                     }}
                   />
                 </div>
+                {!isPhoneValid && phone && <small style={{ color: '#dc2626' }}>Enter a valid phone number.</small>}
               </div>
 
-              <button 
+              <button
                 onClick={handlePayment}
-                disabled={!phone}
-                className="btn-primary" 
-                style={{ width: '100%', justifyContent: 'center', padding: '1.25rem', opacity: phone ? 1 : 0.5 }}
+                disabled={!isPhoneValid}
+                className="btn-primary"
+                style={{ width: '100%', justifyContent: 'center', padding: '1.25rem', opacity: isPhoneValid ? 1 : 0.5 }}
               >
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/MTN_Logo.svg/1200px-MTN_Logo.svg.png" alt="MoMo" style={{ height: '24px', marginRight: '0.5rem' }} />
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/MTN_Logo.svg/1200px-MTN_Logo.svg.png"
+                  alt="MoMo"
+                  style={{ height: '24px', marginRight: '0.5rem' }}
+                />
                 {t.pay}
               </button>
             </div>

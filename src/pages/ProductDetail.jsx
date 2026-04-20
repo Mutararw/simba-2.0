@@ -8,15 +8,15 @@ const ProductDetail = ({ lang }) => {
   const { id } = useParams()
   const navigate = useNavigate()
   const { addToCart } = useCart()
-  
-  const product = productData.products.find(p => p.id === parseInt(id))
+
+  const product = productData.products.find((p) => p.id === parseInt(id, 10))
 
   if (!product) return <div className="container">Product not found</div>
 
   const translations = {
-    en: { addToCart: "Add to Cart", inStock: "In Stock", fastDelivery: "Fast Delivery", securePayment: "Secure Payment", easyReturn: "7 Days Return" },
-    fr: { addToCart: "Ajouter au Panier", inStock: "En Stock", fastDelivery: "Livraison Rapide", securePayment: "Paiement Sécurisé", easyReturn: "Retour en 7 Jours" },
-    kn: { addToCart: "Ongerera mu Ikarita", inStock: "Birahari", fastDelivery: "Kugezwaho vuba", securePayment: "Kwishura mu mutekano", easyReturn: "Gusubiza mu minsi 7" }
+    en: { addToCart: 'Add to Cart', inStock: 'In Stock', fastDelivery: 'Fast Delivery', securePayment: 'Secure Payment', easyReturn: '7 Days Return' },
+    fr: { addToCart: 'Ajouter au Panier', inStock: 'En Stock', fastDelivery: 'Livraison Rapide', securePayment: 'Paiement Securise', easyReturn: 'Retour en 7 Jours' },
+    kn: { addToCart: 'Ongerera mu Ikarita', inStock: 'Birahari', fastDelivery: 'Kugezwaho vuba', securePayment: 'Kwishura mu mutekano', easyReturn: 'Gusubiza mu minsi 7' }
   }
 
   const t = translations[lang]
@@ -27,35 +27,31 @@ const ProductDetail = ({ lang }) => {
         <ArrowLeft size={20} /> Back to Shopping
       </button>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem' }}>
+      <div className="product-detail-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem' }}>
         <div className="glass" style={{ borderRadius: '32px', overflow: 'hidden', height: 'fit-content' }}>
           <img src={product.image} alt={product.name} style={{ width: '100%', height: 'auto', display: 'block' }} />
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <span className="badge" style={{ alignSelf: 'flex-start' }}>{product.category}</span>
-          <h1 style={{ fontSize: '3rem', fontWeight: '800', lineHeight: 1.1 }}>{product.name}</h1>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--primary)' }}>
-              {product.price.toLocaleString()} RWF
-            </span>
+          <span className="badge" style={{ alignSelf: 'flex-start' }}>
+            {product.category}
+          </span>
+          <h1 style={{ fontSize: 'clamp(2rem, 4.8vw, 3rem)', fontWeight: '800', lineHeight: 1.1 }}>{product.name}</h1>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--primary)' }}>{product.price.toLocaleString()} RWF</span>
             <span style={{ color: '#22c55e', fontWeight: '700', fontSize: '1.1rem' }}>{t.inStock}</span>
           </div>
 
           <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', lineHeight: 1.6 }}>
-            Premium quality {product.name} available now at Simba Supermarket. Experience the best shopping in Rwanda with our high-quality products and excellent service.
+            Premium quality {product.name} available now at Simba Supermarket. Experience dependable delivery, secure checkout, and top value on every order.
           </p>
 
-          <button 
-            onClick={() => addToCart(product)}
-            className="btn-primary" 
-            style={{ padding: '1.25rem 2rem', fontSize: '1.2rem', justifyContent: 'center' }}
-          >
-            <ShoppingCart size={24} /> {t.addToCart}
+          <button onClick={() => addToCart(product)} className="btn-primary" style={{ padding: '1.25rem 2rem', fontSize: '1.05rem', justifyContent: 'center' }}>
+            <ShoppingCart size={22} /> {t.addToCart}
           </button>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '2rem' }}>
+          <div className="detail-benefits" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
             {[
               { icon: <Truck size={20} />, label: t.fastDelivery },
               { icon: <ShieldCheck size={20} />, label: t.securePayment },
